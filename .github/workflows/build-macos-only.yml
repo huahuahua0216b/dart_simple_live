@@ -9,6 +9,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          repository: xiaoyaocz/dart_simple_live
+          ref: dev
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -18,6 +21,10 @@ jobs:
 
       - name: Enable macOS desktop
         run: flutter config --enable-macos-desktop
+
+      - name: Pin connectivity_plus for GitHub macOS runner
+        working-directory: simple_live_app
+        run: dart pub add connectivity_plus:7.0.0
 
       - name: Restore packages
         working-directory: simple_live_app
