@@ -1,0 +1,42 @@
+name: build-macos-only
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.x"
+          cache: true
+
+      - name: Enable macOS desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Restore packages
+        working-directory: simple_live_app
+        run: flutter pub get
+
+      - name: Install appdmg
+        run: npm install -g appdmg
+
+      - name: Install flutter_distributor
+        run: dart pub global activate flutter_distributor
+
+      - name: Build macOS DMG and ZIP
+        working-directory: simple_live_app
+        run: flutter_distributor package --platform macos --targets dmg,zip --skip-clean
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: simple-live-macos
+          path: |
+            simple_live_app/build/dist/**/*.dmg
+            simple_live_app/build/dist/**/*.zip
